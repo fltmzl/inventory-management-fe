@@ -186,7 +186,7 @@ export default function CategoriesTable({ categories }: CategoriesTableProps) {
           </TableColumn>
         )}
       </TableHeader>
-      <TableBody emptyContent={"Nama pelanggan tidak ditemukan"} items={sortedItems}>
+      <TableBody emptyContent={"Kategori tidak ditemukan"} items={sortedItems}>
         {(item) => (
           <TableRow key={item.id}>
             {(columnKey) => {
