@@ -1,8 +1,15 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
+import NextUIProviderClient from "@/providers/NextUIProviderClient";
+import ProvidersClient from "@/providers/ProvidersClient";
+import { Toaster } from "react-hot-toast";
 
-const inter = Inter({ subsets: ["latin"] });
+const poppins = Poppins({
+  weight: ["200", "400", "500", "600", "700", "800"],
+  subsets: ["latin"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -15,8 +22,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
+    // <html lang="en" className="dark">
+    <html lang="en" className="dark">
+      <body className={poppins.className}>
+        <NextUIProviderClient>
+          <ProvidersClient>{children}</ProvidersClient>
+          <Toaster
+            position="bottom-right"
+            toastOptions={{
+              style: {
+                padding: "15px 15px",
+              },
+            }}
+          />
+        </NextUIProviderClient>
+      </body>
     </html>
   );
 }
