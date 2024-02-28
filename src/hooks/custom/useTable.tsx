@@ -1,5 +1,6 @@
 import { Selection, SortDescriptor } from "@nextui-org/react";
 import { useState, useMemo, useCallback } from "react";
+import { useMediaQuery } from "./useMediaQuery";
 
 type DataWithNamaProperty<T> = T extends { nama: any } ? T : never;
 
@@ -14,6 +15,7 @@ type useTableProps<T> = {
 };
 
 export default function useTable<T>({ columns, initialVisibleColumns, data }: useTableProps<T>) {
+  const isLargeScreen = useMediaQuery("(min-width: 1024px)");
   const [page, setPage] = useState(1);
   const [filterValue, setFilterValue] = useState("");
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
@@ -101,5 +103,6 @@ export default function useTable<T>({ columns, initialVisibleColumns, data }: us
     onRowsPerPageChange,
     onClear,
     onSearchChange,
+    isLargeScreen,
   };
 }
