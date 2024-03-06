@@ -4,8 +4,7 @@ import useSWR from "swr";
 import CustomerForm from "../Form/CustomerForm";
 import { api } from "@/utils/axios";
 import { useRouter } from "next/navigation";
-import toast, { Toaster } from "react-hot-toast";
-import { Button } from "@nextui-org/react";
+import toast from "react-hot-toast";
 import { CustomerBody } from "../Form/customerBody";
 
 export default function CustomerDetail({ id }: { id: string }) {

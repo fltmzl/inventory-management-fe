@@ -23,7 +23,7 @@ export default function Sidebar() {
           <SidebarItem href="/dashboard" icon={<RxDashboard size={20} />} title="Dashboard" />
           <SidebarItem href="/dashboard/users" icon={<HiOutlineUsers size={20} />} title="Data Karyawan" />
           <SidebarItem href="/dashboard/customers" icon={<PiUsersThree size={20} />} title="Data Pelanggan" />
-          <SidebarItem href="/dashboard/stock" icon={<BsBoxSeam size={20} />} title="Data Stok Barang" />
+          <SidebarItem href="/dashboard/inventories" icon={<BsBoxSeam size={20} />} title="Data Stok Barang" />
           <SidebarItem href="/dashboard/categories" icon={<LuTags size={20} />} title="Kategori Barang" />
           <SidebarItem href="/dashboard/units" icon={<TbWeight size={20} />} title="Satuan Barang" />
 

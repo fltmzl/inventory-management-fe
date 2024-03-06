@@ -15,7 +15,7 @@ export default function Header() {
   const { theme, setTheme } = useTheme();
 
   return (
-    <header className="py-3 px-4 lg:px-6 flex justify-between bg-background w-full sticky top-0 z-10">
+    <header className="py-3 px-4 lg:px-6 flex justify-between bg-background w-full sticky top-0 z-30">
       <Button className="lg:hidden" isIconOnly variant="light" aria-label="drawer menu" onClick={() => dispatch(toggleDrawer())}>
         <HiMiniBars3BottomLeft size={30} />
       </Button>
