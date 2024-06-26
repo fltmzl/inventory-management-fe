@@ -1,4 +1,4 @@
-import { Pagination, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Dropdown, DropdownTrigger, Button, DropdownMenu, DropdownItem, Link, Input, useDisclosure } from "@nextui-org/react";
+import { Pagination, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Dropdown, DropdownTrigger, Button, DropdownMenu, DropdownItem, Link, Input } from "@nextui-org/react";
 import { useState, useMemo, useCallback } from "react";
 import { columns } from "./data";
 import { MdOutlineEdit } from "react-icons/md";
@@ -13,29 +13,24 @@ import { useSWRConfig } from "swr";
 import toast from "react-hot-toast";
 import { useMediaQuery } from "@/hooks/custom/useMediaQuery";
 import useTable from "@/hooks/custom/useTable";
-import DeleteModal from "./DeleteModal";
+import { ISODateToLocal } from "@/utils/dateTime";
+import { formatToRupiah } from "@/utils/formatToRupiah";
 
-const INITIAL_VISIBLE_COLUMNS = ["id", "nama", "stok", "harga", "kategori", "satuan", "actions"];
+const INITIAL_VISIBLE_COLUMNS = ["id", "barang", "hargaTotal", "pelanggan", "tanggal"];
 
-type CategoriesTableProps = {
-  inventories: Inventory[];
+type TransactionsTableProps = {
+  transactions: TransactionOut[];
 };
 
-export default function InventoriesTable({ inventories }: CategoriesTableProps) {
+export default function TransactionsInTable({ transactions }: TransactionsTableProps) {
   const { mutate } = useSWRConfig();
   const isLargeScreen = useMediaQuery("(min-width: 1024px)");
   const { headerColumns, page, setPage, pages, selectedKeys, setSelectedKeys, sortDescriptor, setSortDescriptor, sortedItems, onClear, onRowsPerPageChange, filterValue, onSearchChange, visibleColumns, setVisibleColumns } = useTable({
     columns: columns,
-    data: inventories,
+    data: transactions,
     initialVisibleColumns: INITIAL_VISIBLE_COLUMNS,
+    columnToSearch: "id",
   });
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [itemToBeDeleted, setItemToBeDeleted] = useState("");
-
-  const onOpenDeleteDialog = (id: string) => {
-    setItemToBeDeleted(id);
-    onOpen();
-  };
 
   const onDeleteItem = useCallback(
     async (inventoryId: string) => {
@@ -53,25 +48,13 @@ export default function InventoriesTable({ inventories }: CategoriesTableProps) 
     [mutate]
   );
 
-  type cellValueType =
-    | string
-    | number
-    | {
-        kode: string;
-        nama: string;
-      };
+  type cellValueType = string | number | object;
 
   const renderCell = useCallback(
-    (inventory: Inventory, columnKey: React.Key) => {
-      const cellValue: cellValueType = inventory[columnKey as keyof Inventory];
+    (transaction: TransactionOut, columnKey: React.Key) => {
+      const cellValue: cellValueType = transaction[columnKey as keyof TransactionOut];
 
       switch (columnKey) {
-        case "nama":
-          return (
-            <div>
-              <p className="font-medium">{inventory.nama}</p>
-            </div>
-          );
         case "actions":
           return (
             <div className="relative flex justify-end items-center gap-2">
@@ -89,23 +72,30 @@ export default function InventoriesTable({ inventories }: CategoriesTableProps) 
                     }}
                     startContent={<MdOutlineEdit />}
                     as={Link}
-                    href={`/dashboard/inventories/edit/${inventory.id}`}
+                    href={`/dashboard/transactions-out/edit/${transaction.id}`}
                     className="text-inherit"
                   >
                     Edit
                   </DropdownItem>
-                  <DropdownItem
-                    startContent={<FaRegTrashAlt />}
-                    color="danger"
-                    // onPress={onOpen}
-                    onClick={() => onOpenDeleteDialog(inventory.id)}
-                  >
+                  <DropdownItem startContent={<FaRegTrashAlt />} color="danger" onClick={() => onDeleteItem(transaction.id)}>
                     Delete
                   </DropdownItem>
                 </DropdownMenu>
               </Dropdown>
             </div>
           );
+        case "barang":
+          return (
+            <div>
+              {transaction.barang.map((barangItem) => (
+                <p key={barangItem.id}>{`${barangItem.nama}   ( ${barangItem.jumlah} ${barangItem.satuan} x Rp${formatToRupiah(Number(barangItem.hargaSatuan))} )`}</p>
+              ))}
+            </div>
+          );
+        case "hargaTotal":
+          return <p>{`Rp${formatToRupiah(Number(transaction.hargaTotal))}`}</p>;
+        case "tanggal":
+          return <p>{ISODateToLocal(transaction.tanggal)}</p>;
         default:
           if (typeof cellValue === "object") {
             return cellValue.nama;
@@ -120,7 +110,7 @@ export default function InventoriesTable({ inventories }: CategoriesTableProps) 
   const topContent = useMemo(() => {
     return (
       <div className="flex flex-col gap-4 mb-4">
-        <div className="flex flex-col lg:flex-row justify-between gap-3 items-center">
+        <div className="flex flex-col md:flex-row justify-between gap-3 items-center">
           <div className="flex justify-between items-center">
             <label className="flex items-center text-default-400 text-xs">
               Tampilkan
@@ -150,8 +140,8 @@ export default function InventoriesTable({ inventories }: CategoriesTableProps) 
               </DropdownMenu>
             </Dropdown>
 
-            <Button as={Link} href="/dashboard/inventories/add" color="primary" className="font-semibold w-fit" startContent={<IoIosAdd size={20} />}>
-              Barang
+            <Button as={Link} href="/dashboard/transactions-out/add" color="primary" className="font-semibold w-fit" startContent={<IoIosAdd size={20} />}>
+              Transaksi Keluar
             </Button>
 
             <Input
@@ -162,7 +152,7 @@ export default function InventoriesTable({ inventories }: CategoriesTableProps) 
                 inputWrapper: "py-0 h-full",
               }}
               size="sm"
-              placeholder="Cari berdasarkan nama"
+              placeholder="Cari berdasarkan ID Transaksi"
               startContent={<FiSearch />}
               value={filterValue}
               onClear={() => onClear()}
@@ -177,59 +167,49 @@ export default function InventoriesTable({ inventories }: CategoriesTableProps) 
   const bottomContent = useMemo(() => {
     return (
       <div className="py-8 px-8 flex justify-end items-center bg-background rounded-b-large">
-        <span className="w-[30%] text-small text-default-400">Total data: {inventories.length}</span>
+        <span className="w-[30%] text-small text-default-400">Total data: {transactions.length}</span>
 
         <div className="flex gap-2 items-center">
           <Pagination isCompact showControls showShadow color="primary" page={page} total={pages} onChange={setPage} />
         </div>
       </div>
     );
-  }, [page, pages, inventories.length, setPage]);
+  }, [page, pages, transactions.length, setPage]);
 
   return (
-    <>
-      <Table
-        aria-label="customer table"
-        isHeaderSticky
-        bottomContent={bottomContent}
-        bottomContentPlacement="outside"
-        className="gap-0"
-        classNames={{
-          wrapper: "max-h-[382px] bg-background rounded-b-none shadow-none",
-        }}
-        selectedKeys={selectedKeys}
-        selectionMode="none"
-        sortDescriptor={sortDescriptor}
-        topContent={topContent}
-        topContentPlacement="outside"
-        onSelectionChange={setSelectedKeys}
-        onSortChange={setSortDescriptor}
-      >
-        <TableHeader columns={headerColumns}>
-          {(column) => (
-            <TableColumn key={column.uid} align={column.uid === "actions" ? "center" : "start"} allowsSorting={column.sortable}>
-              {column.name}
-            </TableColumn>
-          )}
-        </TableHeader>
-        <TableBody emptyContent={"Barang tidak ditemukan"} items={sortedItems}>
-          {(item) => (
-            <TableRow key={item.id}>
-              {(columnKey) => {
-                return <TableCell>{renderCell(item, columnKey)}</TableCell>;
-              }}
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-      <DeleteModal
-        isOpen={isOpen}
-        onOpenChange={onOpenChange}
-        title="Hapus Data Barang"
-        desc="Apakah Anda yakin ingin menghapus data barang ini? Data akan dihapus secara permanen"
-        itemIdToBeDeleted={itemToBeDeleted}
-        onDelete={onDeleteItem}
-      />
-    </>
+    <Table
+      aria-label="customer table"
+      isHeaderSticky
+      bottomContent={bottomContent}
+      bottomContentPlacement="outside"
+      className="gap-0"
+      classNames={{
+        wrapper: "max-h-[382px] bg-background rounded-b-none shadow-none",
+      }}
+      selectedKeys={selectedKeys}
+      selectionMode="none"
+      sortDescriptor={sortDescriptor}
+      topContent={topContent}
+      topContentPlacement="outside"
+      onSelectionChange={setSelectedKeys}
+      onSortChange={setSortDescriptor}
+    >
+      <TableHeader columns={headerColumns}>
+        {(column) => (
+          <TableColumn key={column.uid} align={column.uid === "actions" ? "center" : "start"} allowsSorting={column.sortable}>
+            {column.name}
+          </TableColumn>
+        )}
+      </TableHeader>
+      <TableBody emptyContent={"Transaksi tidak ditemukan"} items={sortedItems}>
+        {(item) => (
+          <TableRow key={item.id}>
+            {(columnKey) => {
+              return <TableCell>{renderCell(item, columnKey)}</TableCell>;
+            }}
+          </TableRow>
+        )}
+      </TableBody>
+    </Table>
   );
 }

@@ -2,7 +2,7 @@ import { Selection, SortDescriptor } from "@nextui-org/react";
 import { useState, useMemo, useCallback } from "react";
 import { useMediaQuery } from "./useMediaQuery";
 
-type DataWithNamaProperty<T> = T extends { nama: any } ? T : never;
+type DataWithNamaProperty<T> = T extends { nama: any } ? T : any;
 
 type useTableProps<T> = {
   columns: {
@@ -12,9 +12,10 @@ type useTableProps<T> = {
   }[];
   initialVisibleColumns: string[];
   data: DataWithNamaProperty<T>[];
+  columnToSearch?: any;
 };
 
-export default function useTable<T>({ columns, initialVisibleColumns, data }: useTableProps<T>) {
+export default function useTable<T>({ columns, initialVisibleColumns, data, columnToSearch = "nama" }: useTableProps<T>) {
   const isLargeScreen = useMediaQuery("(min-width: 1024px)");
   const [page, setPage] = useState(1);
   const [filterValue, setFilterValue] = useState("");
@@ -22,7 +23,7 @@ export default function useTable<T>({ columns, initialVisibleColumns, data }: us
   const [visibleColumns, setVisibleColumns] = useState<Selection>(new Set(initialVisibleColumns));
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
-    column: "nama",
+    column: columnToSearch,
     direction: "ascending",
   });
 
@@ -38,11 +39,11 @@ export default function useTable<T>({ columns, initialVisibleColumns, data }: us
     let filteredData = [...data];
 
     if (hasSearchFilter) {
-      filteredData = filteredData.filter((data) => data.nama.toLowerCase().includes(filterValue.toLowerCase()));
+      filteredData = filteredData.filter((data) => data[columnToSearch].toLowerCase().includes(filterValue.toLowerCase()));
     }
 
     return filteredData;
-  }, [data, filterValue, hasSearchFilter]);
+  }, [data, filterValue, hasSearchFilter, columnToSearch]);
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
 

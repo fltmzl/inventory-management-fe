@@ -26,16 +26,17 @@ export default function Sidebar() {
           <SidebarItem href="/dashboard/inventories" icon={<BsBoxSeam size={20} />} title="Data Stok Barang" />
           <SidebarItem href="/dashboard/categories" icon={<LuTags size={20} />} title="Kategori Barang" />
           <SidebarItem href="/dashboard/units" icon={<TbWeight size={20} />} title="Satuan Barang" />
+          <SidebarItem href="/dashboard/item-requests" icon={<TbWeight size={20} />} title="Permintaan Barang" />
 
           <SidebarGroup icon={<IoReceiptOutline size={20} />} label="Transaksi">
-            <SidebarItem href="/dashboard/transaction-in" icon={<IoReceiptOutline size={20} />} title="Barang Masuk" />
-            <SidebarItem href="/dashboard/transaction-out" icon={<IoReceiptOutline size={20} />} title="Barang Keluar" />
+            <SidebarItem href="/dashboard/transactions-in" icon={<IoReceiptOutline size={20} />} title="Barang Masuk" />
+            <SidebarItem href="/dashboard/transactions-out" icon={<IoReceiptOutline size={20} />} title="Barang Keluar" />
           </SidebarGroup>
 
           <SidebarGroup icon={<TbReportAnalytics size={20} />} label="Laporan">
             <SidebarItem href="/dashboard/report-stock" icon={<TbReportAnalytics size={20} />} title="Laporan Stok" />
-            <SidebarItem href="/dashboard/report-transaction-in" icon={<TbReportAnalytics size={20} />} title="Laporan Barang Keluar" />
-            <SidebarItem href="/dashboard/report-transaction-out" icon={<TbReportAnalytics size={20} />} title="Laporan Barang Masuk" />
+            <SidebarItem href="/dashboard/report-transactions-in" icon={<TbReportAnalytics size={20} />} title="Laporan Barang Masuk" />
+            <SidebarItem href="/dashboard/report-transactions-out" icon={<TbReportAnalytics size={20} />} title="Laporan Barang Keluar" />
           </SidebarGroup>
         </div>
       </div>
