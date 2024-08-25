@@ -9,4 +9,6 @@ type User = {
   role: "ADMIN" | "OWNER";
   createdAt: string;
   updatedAt: string;
+  exp: number;
+  iat: number;
 };

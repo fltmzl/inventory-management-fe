@@ -4,8 +4,14 @@ import { Input } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { api } from "@/utils/axios";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import { setAccessToken } from "@/helpers/auth";
 
 export default function LoginPage() {
+  const router = useRouter();
+
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -15,8 +21,19 @@ export default function LoginPage() {
       email: Yup.string().email("Format email salah").required("Email harus diisi"),
       password: Yup.string().min(8, "Password minimal 8 karakter").required("Password harus diisi"),
     }),
-    onSubmit: (values) => {
-      console.log(values);
+    onSubmit: async (values) => {
+      try {
+        const user = await api.post("/auth/login", {
+          email: values.email,
+          password: values.password,
+        });
+
+        setAccessToken(user.data.access_token);
+        router.replace("/dashboard");
+      } catch (error) {
+        console.log(error);
+        toast.error("Gagal login. Email atau Password salah");
+      }
     },
   });
 

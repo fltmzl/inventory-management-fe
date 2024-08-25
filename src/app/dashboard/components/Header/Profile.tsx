@@ -1,3 +1,5 @@
+"use client";
+
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, User } from "@nextui-org/react";
 import React from "react";
 import { IoChevronDownOutline } from "react-icons/io5";
